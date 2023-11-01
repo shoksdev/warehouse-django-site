@@ -1,0 +1,92 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Создание нового пользователя{% endblock %}
+  {% block extrastyle %}
+  <!-- Добавляем свой стили и немного изменяем уже существующие из django-grappeli -->
+  <style>
+    .grp-module {
+        width: 50%;
+        margin-left: 430px;
+    }
+    #form-center {
+        margin-left: 815px;
+        margin-top: 15px;
+    }
+    .grp-row .vTextField {
+        width: 630px;
+    }
+  </style>
+{% endblock %}
+</head>
+<body>
+    <!-- BREADCRUMBS -->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li><a href="{% url 'main:profile' %}">Профиль</a></li>
+        <li>Создание нового пользователя</li>
+    </ul>
+    {% endblock %}
+    <!-- Форма для регистрации -->
+    {% block content %}
+        <form action="{% url 'main:register' %}" method="post">
+            {% csrf_token %}
+            <fieldset class="grp-module">
+                <h2>Создание нового пользователя</h2>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="username">Никнейм</label></div>
+                        <div class="c-2"><input type="text" id="username" name="username" class="vTextField" placeholder="Введите никнейм пользователя" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="first_name">Имя</label></div>
+                        <div class="c-2"><input type="text" id="first_name" name="first_name" class="vTextField" placeholder="Введите имя" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="last_name">Фамилия</label></div>
+                        <div class="c-2"><input type="text" id="last_name" name="last_name" class="vTextField" placeholder="Введите фамилию" required></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="position">Должность</label></div>
+                        <div class="c-2"><input type="text" id="position" name="position" class="vTextField" placeholder="Введите должность" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="email">Адрес электронной почты</label></div>
+                        <div class="c-2"><input type="email" id="email" name="email" class="vTextField" placeholder="Введите адрес электронной почты" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="password1">Пароль</label></div>
+                        <div class="c-2"><input type="password" id="password1" name="password1" class="vTextField" placeholder="Введите пароль" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="password2">Подтвердите пароль</label></div>
+                        <div class="c-2"><input type="password" id="password2" name="password2" class="vTextField" placeholder="Введите пароль ещё раз" required/></div>
+                    </div>
+                </div>
+            </fieldset>
+        <!--Используем кнопку из django-grappelli, но подгоняем её под размеры формы-->
+            <input type="submit" class="grp-button grp-default" id="form-center" value="Создать"/>
+        </form>
+    {% endblock %}
+
+    {% block footer %}<footer id="submit" class="grp-fixed-footer"></footer>{% endblock %}
+</body>
+</html>

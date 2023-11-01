@@ -1,0 +1,126 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Отчёты по приходам{% endblock %}
+    <!--Добавляем свои стили(центруем значения в ячейках таблицы, изменяем ширину класса grp-module и делаем отступ от таблицы сверху)-->
+    {% block extrastyle %}
+        <style>
+            td {
+                text-align: center;
+            }
+
+            #Table {
+                margin-bottom: 20px;
+            }
+            #Table_filter {
+                font-weight: bold;
+                margin-right: 515px;
+                margin-bottom: 40px;
+            }
+            #Table_filter input {
+                border-radius: 20px;
+            }
+            #Table_length {
+                font-weight: bold;
+                margin-bottom: 40px;
+            }
+            #Table_length select {
+                border-radius: 20px;
+            }
+            #Table_paginate {
+                font-weight: bold;
+                margin-right: 505px;
+            }
+            td {
+                text-align: center;
+            }
+            .grp-module {
+                position: absolute;
+                width: 562px;
+            }
+            table.grp-table {
+                margin-top: 18px;
+            }
+        </style>
+    {% endblock %}
+    {% block extrahead %}
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+        <script type="text/javascript">
+        $(document).ready( function () {
+            $('#Table').DataTable();
+        } );
+    </script>
+    {% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+        <ul>
+            <li><a href="{% url 'main:index' %}">Главная</a></li>
+            <li>Отчёты по приходам</li>
+        </ul>
+    {% endblock %}
+    {% block content_title %}
+        <h1>Отчёты по приходам</h1>
+        <!--DATE-HIERARCHY-->
+        <div class="grp-module">
+            <div class="grp-row">
+                {% spaceless %}
+                    <nav class="grp-date-hierarchy">
+                        <header style="display:none"><h1>Date Hierarchy</h1></header>
+                        <ul>
+                            <li><a href="{% url 'main:arrival_report_filter' pk=4 %}" class="grp-date-hierarchy-back">Все записи</a></li>
+                            <li><a href="{% url 'main:arrival_report_filter' pk=1 %}">Год</a></li>
+                            <li><a href="{% url 'main:arrival_report_filter' pk=2 %}">Месяц</a></li>
+                            <li><a href="{% url 'main:arrival_report_filter' pk=3 %}">День</a></li>
+                        </ul>
+                    </nav>
+                {% endspaceless %}
+            </div>
+        </div>
+        <br>
+        <br>
+    {% endblock %}
+    {% block content %}
+            {% csrf_token %}
+            <!--Вывод объектов модели в виде таблицы-->
+            <br>
+            <table id="Table" class="grp-table display" style="width: 898px; float: left;">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Пользователь</th>
+                        <th>Продавец</th>
+                        <th>Товар</th>
+                        <th>Дата расхода</th>
+                        <th>Количество товара</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for arrival in arrival_reports %}
+                    <tr>
+                        <td>{{ arrival.arrival_id }}</td>
+                        <td>{{ arrival.user }}</td>
+                        <td>{{ arrival.supplier_id.company_name }}</td>
+                        <td>{{ arrival.products.all|join:", " }}</td>
+                        <td>{{ arrival.arrival_date }}</td>
+                        <td>{{ arrival.quantity }}</td>
+                        <td>{{ arrival.result }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    {% endblock %}
+</body>
+</html>
+

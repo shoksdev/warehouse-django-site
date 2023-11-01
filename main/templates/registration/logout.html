@@ -1,0 +1,29 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Выход из аккаунта успешен{% endblock %}
+  {% block extrastyle %}
+  <!-- Добавляем свой стили и немного изменяем уже существующие из django-grappeli -->
+  <style>
+      #submit {
+        height: 40px;
+        border-radius: 0px;
+      }
+      .grp-module {
+        width: 25%;
+        height: 133px;
+      }
+  </style>
+{% endblock %}
+</head>
+<body>
+    {% block content %}
+    <h1>Вы вышли из аккаунта, всего доброго!</h1>
+    {% endblock %}
+</body>
+</html>

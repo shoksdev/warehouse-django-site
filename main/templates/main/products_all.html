@@ -1,0 +1,122 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Товары{% endblock %}
+    <!--Добавляем свои стили(центруем значения в ячейках таблицы)-->
+    {% block extrastyle %}
+        <style>
+            td {
+                text-align: center;
+            }
+
+            #Table {
+                margin-bottom: 20px;
+            }
+            #Table_filter {
+                font-weight: bold;
+                margin-right: 515px;
+                margin-bottom: 40px;
+            }
+            #Table_filter input {
+                border-radius: 20px;
+            }
+            #Table_length {
+                font-weight: bold;
+                margin-bottom: 40px;
+            }
+            #Table_length select {
+                border-radius: 20px;
+            }
+            #Table_paginate {
+                font-weight: bold;
+                margin-right: 505px;
+            }
+        </style>
+    {% endblock %}
+    {% block extrahead %}
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+        <script type="text/javascript">
+        $(document).ready( function () {
+            $('#Table').DataTable();
+        } );
+    </script>
+    {% endblock %}
+</head>
+<body>
+    {% block breadcrumbs %}
+        <ul>
+            <li><a href="{% url 'main:index' %}">Главная</a></li>
+            <li>Товары</li>
+        </ul>
+    {% endblock %}
+    {% block content_title %}
+        <h1>Все товары</h1>
+        <!--CREATE OBJECT FORM-->
+        <ul class="grp-object-tools">
+            {% block object-tools-items %}
+                <li><a href="{% url 'main:product_add' %}" class="grp-add-link grp-state-focus">Добавить товар</a></li>
+            {% endblock %}
+        </ul>
+    {% endblock %}
+    {% block content %}
+        <br>
+        <!--DELETE OBJECT FOR CHECKBOXES FORM-->
+        <form action="{% url 'main:product_delete' %}" method="POST">
+            {% csrf_token %}
+            <!--Вывод объектов модели в виде таблицы-->
+            <table id="Table" class="grp-table display" style="width: 898px; float: left;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>№</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>СКУ</th>
+                        <th>Категория</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>На складе</th>
+                        <th>Под заказ</th>
+                        <th>Уровень заказа</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    {% if product.sku != '-' %}
+                        <tr class="grp-row-even">
+                            <td><input type="checkbox" name="product_list" value="{{ product.product_id }}"></td> <!--Создание флажков для удаления-->
+                            <td>{{ product.product_id }}</td>
+                            <td><a href="{% url 'main:product_change' pk=product.pk %}">{{ product.name }}</a></td> <!--EDIT OBJECT FORM-->
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.sku }}</td>
+                            <td>{{ product.category }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.units_in_stock }}</td>
+                            <td>{{ product.units_on_order }}</td>
+                            <td>{{ product.reorder_level }}</td>
+                        </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <!--DELETE BUTTON FORM-->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="submit" class="grp-button grp-default" value="Удалить"/></li>
+            </form>
+        </form>
+    {% endblock %}
+</body>
+</html>

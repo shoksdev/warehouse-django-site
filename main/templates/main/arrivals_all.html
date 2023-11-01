@@ -1,0 +1,518 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Приходы{% endblock %}
+    <!--Добавляем свои стили(центруем значения в ячейках таблицы)-->
+    {% block extrastyle %}
+        <style>
+            input[type="submit"] {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            #AddButton {
+                margin-left: 150px;
+                margin-top: -46px;
+                margin-bottom: 20px;
+            }
+            #DeleteButton {
+                margin-left: 60px;
+                margin-top: -46px;
+                margin-bottom: 20px;
+            }
+            td {
+                text-align: center;
+            }
+            #arrival_date {
+            margin: 0;
+            padding: 2px 5px;
+            height: 25px;
+            font-family: Arial,sans-serif;
+            font-size: 12px;
+            line-height: 14px;
+            font-weight: bold;
+            color: #555;
+            border: 1px solid #ccc;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            background: #fdfdfd;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            -moz-box-shadow: inset 0 1px 3px 0 #eee;
+            -webkit-box-shadow: inset 0 1px 3px 0 #eee;
+            box-shadow: inset 0 1px 3px 0 #eee;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        input {
+            text-align: center;
+        }
+        #Table {
+            margin-bottom: 20px;
+        }
+        #Table_filter {
+            text-align: left;
+            font-weight: bold;
+            margin-right: 500px;
+            margin-bottom: 40px;
+        }
+        #Table_filter input {
+            border-radius: 20px;
+        }
+        #Table_length {
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+        #Table_length select {
+            border-radius: 20px;
+        }
+        #Table_paginate {
+            font-weight: bold;
+            margin-right: 491px;
+        }
+        .errorlist div {
+            color: #bf3030;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+        .grp-module {
+            text-align: center;
+            width: 20%;
+            margin-left: 1030px;
+            margin-top: -498px;
+        }
+        </style>
+    {% endblock %}
+
+    {% block extrahead %}
+        <script>
+                function addRow(){
+                    var template = document.getElementById('new-row-template');
+                    var row = document.createElement('tr');
+                    var cell = document.createElement('td');
+                    row.innerHTML = `
+                                      <tr id="new-row-template">
+                                        <td><input type='number' name='arrival_id'></td>
+                                        <td><select name="supplier_id" id="supplier_id">
+                                            {% for supplier in suppliers %}
+                                                <option value="{{ supplier.supplier_id }}">{{ supplier.contact_title }}</option>
+                                            {% endfor %}
+                                        </select></td>
+                                        {% for product in products %}
+                                            <td><input type="checkbox" name="products" value="{{ product.product_id }}">{{ product.name }}</td>
+                                        {% endfor %}
+                                        <td><input type='date' name='arrival_date' id='arrival_date'></td>
+                                        <td><input type='number' name='quantity'></td>
+                                      </tr>
+                                      `;
+                    document.getElementById('Table').appendChild(row);
+                    row.appendChild(cell);
+                    }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+            var table = $('#Table').DataTable();
+        
+            $('#Body').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                } else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+        
+            $('#DeleteButton').click(function () {
+                table.row('.selected').remove().draw(false);
+            });
+        });
+        </script>
+    {% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+        <ul>
+            <li><a href="{% url 'main:index' %}">Главная</a></li>
+            <li>Приходы</li>
+        </ul>
+    {% endblock %}
+    {% block content_title %}
+        <h1>Все приходы</h1>
+        <!--CREATE OBJECT FORM-->
+        <ul class="grp-object-tools">
+            {% block object-tools-items %}
+                <li><a href="{% url 'main:arrival_add' %}" class="grp-add-link grp-state-focus">Добавить приход</a></li>
+            {% endblock %}
+        </ul>
+    {% endblock %}
+    {% block content %}
+        <br>
+        <!--DELETE OBJECT FOR CHECKBOXES FORM-->
+            <form action="{% url 'main:arrival_add' %}" method="POST">
+                {% csrf_token %}
+                <!--Вывод объектов модели в виде таблицы-->
+                <table id="Table" class="grp-table display" style="width: 898px; float: left;">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Продавец</th>
+                            <th>Товар</th>
+                            <th>Дата прихода</th>
+                            <th>Количество товара</th>
+                            <th>Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody id="Body">
+                        {% for arrival in arrivals %}
+                            <tr>
+                                <td><a href="{% url 'main:arrival_change' pk=arrival.pk %}">{{ arrival.arrival_id }}</a></td> <!--EDIT OBJECT FORM-->
+                                <td>{{ arrival.supplier_id.contact_title }}</td>
+                                <td>{{ arrival.products.all|join:", " }}</td>
+                                <td>{{ arrival.arrival_date }}</td>
+                                <td>{{ arrival.quantity }}</td>
+                                <td>{{ arrival.result }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type="submit" class="grp-button grp-default" id="form-center" value="Применить"/>
+            </form>
+        <input type="button" class="grp-button grp-default" id="AddButton" value="Добавить строку" onclick="addRow();">
+        <input type="button" class="grp-button grp-delete-link" id="DeleteButton" value="Удалить">
+        {% if form.errors %}
+        <div class="grp-module">
+            <p class="errornote">Вы допустили ошибки:
+                <div class="errorlist">
+                    {% for field in form %}
+                    <div>
+                        {% if field.errors %}<p>{{ field.label_tag }} {{ field.errors }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+            </p>
+        </div>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>
+
+
+{% extends 'app.html' %}
+{% load custom_filters %}
+{% block privind_detail %}
+<section class="raport__body">
+    <form method="POST" class="flex column gap-1">
+        {% csrf_token %}
+        <div class="raport__title">
+            <h1>2-INV<br>
+                Raport statistic trimestrial<br>
+                Cu privire la investiţii
+            </h1>
+            <span>în trimestrul T/  <select class="select-form">
+        <option></option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+    </select>  /  <select class="select-form">
+        <option></option>
+        <option>2020</option>
+    </select></span>
+        </div>
+
+        <div class="raport__information">
+            <span class="red">Date de identificare</span>
+            <ul>
+                <li>Denumirea:
+                    <div class="lid">EMPLOMARIN S.R.L.</div>
+                </li>
+            </ul>
+            <span>Adresa:</span>
+            <ul>
+                <li>Raionul(municipiul):
+                    <div class="lid">EMPLOMARIN S.R.L.</div>
+                </li>
+                <li>Sat(comuna/sector):
+                    <div class="lid">EMPLOMARIN S.R.L.</div>
+                </li>
+                <li>Strada:
+                    <div class="lid">SEC.RISCANI Ion Pruncul nr.4 bl.1</div>
+                </li>
+                <li>Cod CUIÎO:
+                    <div class="lid"></div>
+                </li>
+                <li>Cod IDNO:
+                    <div class="lid">1008600045376</div>
+                </li>
+                <li>Forma de proprietate:
+                    <select>
+                    </select>
+                </li>
+                <li>Forma organizatorico-juridică:
+                    <select>
+                    </select>
+                </li>
+                <li>Activitatea principală:
+                    <select>
+                    </select>
+                </li>
+                <li>Codul fiscal:
+                    <div class="lid"></div>
+                </li>
+                <li>Conducătorul:
+                    <div class="lid"></div>
+                </li>
+                <li>Executantul:
+                    <div class="lid"></div>
+                </li>
+                <li>Telefon:
+                    <div class="lid"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="raport__title">
+            <h1>Cap. INV: Investiţii în active imobilizate
+            </h1>
+        </div>
+        <div class="raport__title">
+            <span class="left__marg">mii lei; datele se înscriu cu zecimale</span>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th rowspan="2">Nr. rd.</th>
+                <th rowspan="2">Indicatorii</th>
+                <th colspan="2">Trimestrul de raportare</th>
+            </tr>
+            <tr>
+                <th>Intrări obiecte
+                    noi, import</th>
+                <th>Investiții ulterioare și reparații capitale</th>
+            </tr>
+            <tr>
+                <th>A</th>
+                <th>B</th>
+                <th>1</th>
+                <th>2</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in invest_rows_1 %}
+            <tr>
+                <td class="txt-c" rowspan="{{ row.rowspan }}">
+                    {% if request.user.is_superuser %}
+                    {{ row.codul_rind|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="s_codul_rind_{{ row.code }}" value="{{ row.codul_rind|floatformat:"1"|stringreplace }}" id="s_codul_rind_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c" rowspan="{{ row.rowspan }}">
+                    {% if request.user.is_superuser %}
+                    {{ row.indicatori|default:''|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="indicatori_{{ row.code }}" value="{{ row.indicatori|default:''|stringreplace }}" id="indicatori_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.intrari|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" placeholder="" type="text" step="any" name="intrari_{{ row.code }}" value="{{ row.intrari|floatformat:"1"|stringreplace }}" id="intrari_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.investitii|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="investitii_{{ row.code }}" value="{{ row.investitii|floatformat:"1"|stringreplace }}" id="investitii_{{ row.code }}">
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+
+        <div class="raport__title">
+            <h1>Cap. LOC: Clădiri rezidenţiale (de locuit)
+            </h1>
+        </div>
+        <div class="raport__title-row save">
+            <button class="button blue__outline" type="button" onclick="addRow()">Добавить строку</button>
+
+        </div>
+
+        <table id="tableReports">
+            <thead>
+            <tr>
+                <th rowspan="2">№d</th>
+                <th rowspan="2">Cod CUATM oraşe (municipii), sate (comune)</th>
+                <th rowspan="2">Denumirea oraşelor (municipiilor), satelor (comunelor)</th>
+                <th colspan="3">Date în exploatare</th>
+            </tr>
+            <tr>
+                <th>clădiri rezidenţiale/case de locuit individuale, unităţi</th>
+                <th>în care: apartamente/case de locuit individuale, unităţi</th>
+                <th>suprafaţa totală a apartamentelor/caselor de locuit individuale, m2</th>
+            </tr>
+            <tr>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="txt-c">1</td>
+                <td class="txt-c">X</td>
+                <td class="txt-c">Total</td>
+
+                <td id="total_1" class="txt-c td_gray"><input class="w-full tb-input" type="hidden" name="total1" id="total_1"></td>
+                <td id="total_2" class="txt-c td_gray"><input class="w-full tb-input" type="hidden" name="total2" id="total_2"></td>
+                <td id="total_3"class="txt-c td_gray"><input class="w-full tb-input" type="hidden" name="total3" id="total_3"></td>
+                {% if request.user.is_superuser %}
+                {% else %}
+                <td class="txt-c delete-icon-invest" data-code="{{ row.code }}">
+                    <span class="delete-text">Şterge</span>
+                </td>
+                {% endif %}
+            </tr>
+            {% for row in invest_s_2_rows %}
+            <tr>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.codul_rind|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="codul_rind_{{ row.code }}" value="{{ row.codul_rind|floatformat:"1"|stringreplace }}" id="codul_rind_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.code_cuatm|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="code_cuatm_{{ row.code }}" value="{{ row.code_cuatm|floatformat:"1"|stringreplace }}" id="code_cuatm_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.numa_oras|default:''|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="numa_oras_{{ row.code }}" value="{{ row.numa_oras|default:''|stringreplace }}" id="numa_oras_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.cladiri|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="cladiri_{{ row.code }}" value="{{ row.cladiri|floatformat:"1"|stringreplace }}" id="cladiri_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.apart|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="apart_{{ row.code }}" value="{{ row.apart|floatformat:"1"|stringreplace }}" id="apart_{{ row.code }}">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {{ row.sup_total|floatformat:"1"|stringreplace }}
+                    {% else %}
+                    <input class="w-full tb-input" type="text" step="any" name="sup_total_{{ row.code }}" value="{{ row.sup_total|floatformat:"1"|stringreplace }}" id="sup_total_{{ row.code }}">
+                    {% endif %}
+                </td>
+                {% if request.user.is_superuser %}
+                {% else %}
+                <td class="txt-c delete-icon-invest" data-code="{{ row.code }}">
+                    <span class="delete-text">Şterge</span>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            <tr id="new-row-template" style="display: none;">
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_codul_rind_">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_code_cuatm_">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_numa_oras_">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_cladiri_">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_apart_">
+                    {% endif %}
+                </td>
+                <td class="txt-c">
+                    {% if request.user.is_superuser %}
+                    {% else %}
+                    <input class="tb-input w-full" type="text" step="any" name="new_sup_total_">
+                    {% endif %}
+                </td>
+                {% if request.user.is_superuser %}
+                {% else %}
+                <td class="txt-c delete-icon-invest" data-code="{{ row.code }}">
+                    <span class="delete-text">Şterge</span>
+                </td>
+                {% endif %}
+            </tr>
+
+            </tbody>
+
+        </table>
+        <div class="raport__information">
+            <p>Se completează conform Clasificatorului unităţilor administrativ-teritoriale al Republicii Moldova (CUATM) după locul amplasării clădirii rezidenţiale (de locuit).</p>
+            <ul>
+                <li>Vândut populaţiei apartamente noi, unităţi
+                    <div class="lid">EMPLOMARIN S.R.L.</div>
+                    <span>(rd.910)</span>
+                </li>
+            </ul>
+            <ul>
+                <li>Suprafaţa totală, m2
+                    <div class="lid">EMPLOMARIN S.R.L.</div>
+                    <span>(rd.920)</span>
+                </li>
+            </ul>
+            <p>* <span>Important</span>: Datele se prezintă numai pe trimestrul de raportare (de exemplu: pentru trimestrul II – trimestrul de raportare constituie 1 aprilie – 30 iunie).</p>
+            <div class="raport__buttons">
+                <button class="save button blue" type="submit">Сохранить</button>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock privind_detail %}

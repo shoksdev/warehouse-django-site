@@ -1,0 +1,143 @@
+{% extends "admin/base_site.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Добавление продавца{% endblock %}
+        <!--Добавляем свои стили, изменяем стили django-grappelli(делаем форму на 50 
+        процентов от ширины страницы
+        и подгоняем под неё кнопку, добавляем стили для поля ввода номера телефона,
+        так как их нет в django-grappelli)-->
+    {% block extrastyle %}
+    <style>
+        .errorlist div {
+            color: #bf3030;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+        .grp-module {
+            width: 50%;
+            margin-left: 430px;
+        }
+        #form-center {
+            margin-left: 815px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .grp-row .vTextField {
+            width: 630px;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li><a href="{% url 'main:suppliers_all' %}">Продавцы</a></li>
+        <li>Добавление продавца</li>
+    </ul>
+    {% endblock %}
+    <!--CREATE OBJECT FORM-->
+    {% block content %}
+    <form action="{% url 'main:supplier_add' %}" method="post">
+        {% csrf_token %}
+        <!--Используем форму из django-grappelli-->
+        <fieldset class="grp-module">
+            <h2>Добавление продавца</h2>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="supplier_id">№ продавца</label></div>
+                    <div class="c-2"><input type="number" id="supplier_id" name="supplier_id" class="vTextField" placeholder="Введите уникальный номер продавца" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="contact_title">Название контакта</label></div>
+                    <div class="c-2"><input type="text" id="contact_title" name="contact_title" class="vTextField" placeholder="Введите название контакта" required></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="contact_name">Имя контакта</label></div>
+                    <div class="c-2"><input type="text" id="contact_name" name="contact_name" class="vTextField" placeholder="Введите уникальное имя контакта" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="company_name">Название компании</label></div>
+                    <div class="c-2"><input type="text" id="company_name" name="company_name" class="vTextField" placeholder="Введите уникальное название компании" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="country">Страна</label></div>
+                    <div class="c-2"><input type="text" id="country" name="country" class="vTextField" placeholder="Введите страну продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="region">Регион</label></div>
+                    <div class="c-2"><input type="text" id="region" name="region" class="vTextField" placeholder="Введите регион продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="city">Город</label></div>
+                    <div class="c-2"><input type="text" id="city" name="city" class="vTextField" placeholder="Введите город продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="address">Адрес</label></div>
+                    <div class="c-2"><input type="text" id="address" name="address" class="vTextField" placeholder="Введите адрес продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="postal_code">Почтовый индекс</label></div>
+                    <div class="c-2"><input type="number" id="postal_code" name="postal_code" class="vTextField" placeholder="Введите почтовый индекс продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="phone">Номер телефона</label></div>
+                    <div class="c-2"><input type="text" id="phone" name="phone" class="vTextField" placeholder="Введите номер телефона продавца"/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="email">Электронная почта</label></div>
+                    <div class="c-2"><input type="email" id="email" name="email" class="vTextField" placeholder="Введите адрес электронной почты продавца" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="website">Веб-сайт</label></div>
+                    <div class="c-2"><input type="url" id="website" name="website" class="vTextField" placeholder="Введите веб-сайт продавца" required/></div>
+                </div>
+            </div>
+        </fieldset>
+        <!--Используем кнопку из django-grappelli, но подгоняем её под размеры формы-->
+        <input type="submit" class="grp-button grp-default" id="form-center" value="Добавить"/></li>
+        {% if form.errors %}
+        <div class="grp-module">
+            <p class="errornote">Вы допустили ошибки:
+                <div class="errorlist">
+                    {% for field in form %}
+                    <div>
+                        {% if field.errors %}<p>{{ field.label_tag }} {{ field.errors }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+            </p>
+        </div>
+        {% endif %}
+    </form>
+    {% endblock %}
+</body>
+</html>

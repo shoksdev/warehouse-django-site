@@ -1,0 +1,135 @@
+{% extends "admin/base_site.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Добавление расхода{% endblock %}
+        <!--Добавляем свои стили, изменяем стили django-grappelli(делаем форму на 50 
+        процентов от ширины страницы
+        и подгоняем под неё кнопку)-->
+    {% block extrastyle %}
+    <style>
+        .errorlist div {
+            color: #bf3030;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+        .grp-module {
+            width: 50%;
+            margin-left: 430px;
+        }
+        #form-center {
+            margin-left: 815px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .grp-row .vTextField {
+            width: 630px;
+        }
+        #expense_date {
+            margin: 0;
+            padding: 2px 5px;
+            height: 25px;
+            font-family: Arial,sans-serif;
+            font-size: 12px;
+            line-height: 14px;
+            font-weight: bold;
+            color: #555;
+            border: 1px solid #ccc;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            background: #fdfdfd;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            -moz-box-shadow: inset 0 1px 3px 0 #eee;
+            -webkit-box-shadow: inset 0 1px 3px 0 #eee;
+            box-shadow: inset 0 1px 3px 0 #eee;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li><a href="{% url 'main:expenses_all' %}">Расходы</a></li>
+        <li>Добавление расхода</li>
+    </ul>
+    {% endblock %}
+    <!--CREATE OBJECT FORM-->
+    {% block content %}
+    <form action="{% url 'main:expense_add' %}" method="post">
+        {% csrf_token %}
+        <!--Используем форму из django-grappelli-->
+        <fieldset class="grp-module">
+            <h2>Добавление расхода</h2>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="expense_id">№ Расхода</label></div>
+                    <div class="c-2"><input type="number" id="expense_id" name="expense_id" class="vTextField" placeholder="Введите уникальный номер расхода" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="customer_id">Покупатель</label></div>
+                    <div class="c-2">
+                        <!--Используем выпадающий список в котором выводим всех продавцов с помощью цикла-->
+                        <select name="customer_id" id="customer_id">
+                            {% for customer in customers %}
+                                <option value="{{ customer.customer_id }}">{{ customer.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="products">Товар</label></div>
+                    <div class="c-2">
+                        <!--Используем выпадающий список в котором выводим всех продавцов с помощью цикла-->
+                        {% for product in products %}
+                            <input type="checkbox" name="products" value="{{ product.product_id }}">{{ product.name }}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="expense_date">Дата расхода</label></div>
+                    <div class="c-2"><input type="date" id="expense_date" name="expense_date" class="vDateField" placeholder="Введите дату расхода" required></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="quantity">Количество единиц товара</label></div>
+                    <div class="c-2"><input type="number" id="quantity" name="quantity" class="vTextField" placeholder="Введите количество единиц товара" required/></div>
+                </div>
+            </div>
+        </fieldset>
+        <!--Используем кнопку из django-grappelli, но подгоняем её под размеры формы-->
+        <input type="submit" class="grp-button grp-default" id="form-center" value="Добавить"/></li>
+        {% if form.errors %}
+        <div class="grp-module">
+            <p class="errornote">Вы допустили ошибки:
+                <div class="errorlist">
+                    {% for field in form %}
+                    <div>
+                        {% if field.errors %}<p>{{ field.label_tag }} {{ field.errors }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+            </p>
+        </div>
+        {% endif %}
+    </form>
+    {% endblock %}
+</body>
+</html>

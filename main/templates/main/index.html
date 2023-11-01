@@ -1,0 +1,55 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Главная{% endblock %}
+  <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
+  {% block extrastyle %}
+  <style>
+      #submit {
+        height: 40px;
+        border-radius: 0px;
+      }
+      .grp-module {
+        width: 100%;
+        height: 75px;
+      }
+      .grp-row {
+        display: flex;
+        align-items: center;
+        gap: 110px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 50px;
+      }
+      .grp-row p {
+        text-align: center;
+      }
+  </style>
+{% endblock %}
+</head>
+<body>
+
+      {% block breadcrumbs %}
+      <div class="grp-row">
+        <p><a href="{% url 'main:arrivals_all' %}"><strong>Приходы</strong></a></p>
+        <p><a href="{% url 'main:expenses_all' %}"><strong>Расходы</strong></a></p>
+        <p><a href="{% url 'main:customers_all' %}"><strong>Покупатели</strong></a></p>
+        <p><a href="{% url 'main:suppliers_all' %}"><strong>Продавцы</strong></a></p>
+        <p><a href="{% url 'main:products_all' %}"><strong>Товары</strong></a></p>
+        <p><a href="{% url 'main:services_all' %}"><strong>Услуги</strong></a></p>
+        <p><a href="{% url 'main:arrival_reports_all' %}"><strong>Отчёты по приходам</strong></a></p>
+        <p><a href="{% url 'main:expense_reports_all' %}"><strong>Отчёты по расходам</strong></a></p>
+      </div>
+      {% endblock %}
+
+    {% block footer %}<footer id="submit" class="grp-fixed-footer"></footer>{% endblock %}
+</body>
+</html>

@@ -1,0 +1,142 @@
+{% extends "admin/base_site.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Изменение товара{% endblock %}
+    <!--Добавляем свои стили, изменяем стили django-grappelli(делаем форму на 50 
+        процентов от ширины страницы
+        и подгоняем под неё кнопку)-->
+    {% block extrastyle %}
+    <style>
+        .errorlist div {
+            color: #bf3030;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+        .grp-module {
+            width: 50%;
+            margin-left: 430px;
+        }
+        #form-center {
+            margin-left: 815px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .grp-row .vTextField {
+            width: 630px;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li><a href="{% url 'main:products_all' %}">Товары</a></li>
+        <li>Изменение товара</li>
+    </ul>
+    {% endblock %}
+    <!--CHANGE OBJECT FORM-->
+    {% block content %}
+    <form action="{% url 'main:product_change' pk=product.pk %}" method="post">
+        {% csrf_token %}
+        <!--Используем форму из django-grappelli-->
+        <fieldset class="grp-module">
+            <h2>Изменение товара</h2>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="product_id">№ Товара</label></div>
+                    <div class="c-2"><input type="number" id="product_id" name="product_id" class="vTextField" placeholder="Введите уникальный номер товара" value="{{ product.product_id }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="name">Название товара</label></div>
+                    <div class="c-2"><input type="text" id="name" name="name" class="vTextField" placeholder="Введите уникальное название товара" value="{{ product.name }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="description">Описание товара</label></div>
+                    <div class="c-2"><textarea id="description" name="description" class="vLargeTextField" placeholder="Введите описание товара" value="{{ product.description }}" required></textarea></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="sku">СКУ</label></div>
+                    <div class="c-2"><input type="number" id="sku" name="sku" class="vTextField" placeholder="Введите СКУ" value="{{ product.sku }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="category">Категория товара</label></div>
+                    <div class="c-2"><input type="text" id="category" name="category" class="vTextField" placeholder="Введите категорию товара" value="{{ product.category }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="quantity">Количество единиц товара</label></div>
+                    <div class="c-2"><input type="number" id="quantity" name="quantity" class="vTextField" placeholder="Введите количество единиц товара" value="{{ product.quantity }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="price">Цена</label></div>
+                    <div class="c-2"><input type="number" step="any" id="price" name="price" class="vTextField" placeholder="Введите цену товара" value="{{ product.price }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="units_in_stock">Количество единиц на складе</label></div>
+                    <div class="c-2"><input type="number" id="units_in_stock" name="units_in_stock" class="vTextField" placeholder="Введите количество единиц на складе" value="{{ product.units_in_stock }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="units_on_order">Количество единиц под заказ</label></div>
+                    <div class="c-2"><input type="number" id="units_on_order" name="units_on_order" class="vTextField" placeholder="Введите количество единиц под заказ" value="{{ product.units_on_order }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="reorder_level">Уровень заказа</label></div>
+                    <div class="c-2"><input type="number" id="reorder_level" name="reorder_level" class="vTextField" placeholder="Введите уровень заказа" value="{{ product.reorder_level }}" required/></div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label for="discontinued">Снято ли с производства?</label></div>
+                    {% if product.discontinued %}
+                    <input type="radio" name="discontinued" value="{{ product.discontinued }}" checked>Да<br>
+                    <input type="radio" name="discontinued" value="{{ product.discontinued }}">Нет<br>
+                    {% else %}
+                    <input type="radio" name="discontinued" value="{{ product.discontinued }}">Да<br>
+                    <input type="radio" name="discontinued" value="{{ product.discontinued }}" checked>Нет<br>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+        <!--Используем кнопку из django-grappelli, но подгоняем её под размеры формы-->
+        <input type="submit" class="grp-button grp-default" id="form-center" value="Изменить"/>
+        {% if form.errors %}
+        <div class="grp-module">
+            <p class="errornote">Вы допустили ошибки:
+                <div class="errorlist">
+                    {% for field in form %}
+                    <div>
+                        {% if field.errors %}<p>{{ field.label_tag }} {{ field.errors }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+            </p>
+        </div>
+        {% endif %}
+    </form>
+    {% endblock %}
+</body>
+</html>

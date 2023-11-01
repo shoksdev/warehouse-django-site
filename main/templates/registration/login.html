@@ -1,0 +1,61 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Вход в аккаунт{% endblock %}
+  {% block extrastyle %}
+    <!-- Добавляем свой стили и немного изменяем уже существующие из django-grappeli -->
+  <style>
+    .grp-module {
+        width: 50%;
+        margin-left: 430px;
+    }
+    #form-center {
+        margin-left: 815px;
+        margin-top: 15px;
+    }
+    .grp-row .vTextField {
+        width: 630px;
+    }
+  </style>
+{% endblock %}
+</head>
+<body>
+    <!-- BREADCRUMBS -->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li>Вход в аккаунт</li>
+    </ul>
+    {% endblock %}
+    {% block content %}
+        <!-- Сама форма для входа в аккаунт -->
+        <form action="{% url 'main:login' %}" method="post">
+            {% csrf_token %}
+            <fieldset class="grp-module">
+                <h2>Вход в аккаунт</h2>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="username">Никнейм</label></div>
+                        <div class="c-2"><input type="text" id="username" name="username" class="vTextField" placeholder="Введите никнейм" required/></div>
+                    </div>
+                </div>
+                <div class="grp-row">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="password">Пароль</label></div>
+                        <div class="c-2"><input type="password" id="password" name="password" class="vTextField" placeholder="Введите пароль" required/></div>
+                    </div>
+                </div>
+            </fieldset>
+        <!--Используем кнопку из django-grappelli, но подгоняем её под размеры формы-->
+            <input type="submit" class="grp-button grp-default" id="form-center" value="Войти"/>
+        </form>
+    {% endblock %}
+
+    {% block footer %}<footer id="submit" class="grp-fixed-footer"></footer>{% endblock %}
+</body>
+</html>

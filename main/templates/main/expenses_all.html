@@ -1,0 +1,215 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}Расходы{% endblock %}
+    <!--Добавляем свои стили(центруем значения в ячейках таблицы)-->
+    {% block extrastyle %}
+        <style>
+            input[type="submit"] {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            #AddButton {
+                margin-left: 150px;
+                margin-top: -46px;
+                margin-bottom: 20px;
+            }
+            #DeleteButton {
+                margin-left: 60px;
+                margin-top: -46px;
+                margin-bottom: 20px;
+            }
+            td {
+                text-align: center;
+            }
+            #expense_date {
+            margin: 0;
+            padding: 2px 5px;
+            height: 25px;
+            font-family: Arial,sans-serif;
+            font-size: 12px;
+            line-height: 14px;
+            font-weight: bold;
+            color: #555;
+            border: 1px solid #ccc;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            background: #fdfdfd;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            -moz-box-shadow: inset 0 1px 3px 0 #eee;
+            -webkit-box-shadow: inset 0 1px 3px 0 #eee;
+            box-shadow: inset 0 1px 3px 0 #eee;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        input {
+            text-align: center;
+        }
+        #Table {
+            margin-bottom: 20px;
+        }
+        #Table_filter {
+            text-align: left;
+            font-weight: bold;
+            margin-right: 515px;
+            margin-bottom: 40px;
+        }
+        #Table_filter input {
+            border-radius: 20px;
+        }
+        #Table_length {
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+        #Table_length select {
+            border-radius: 20px;
+        }
+        #Table_paginate {
+            font-weight: bold;
+            margin-right: 504px;
+        }
+        .errorlist div {
+            color: #bf3030;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+        .grp-module {
+            text-align: center;
+            width: 20%;
+            margin-left: 1030px;
+            margin-top: -318px;
+        }
+        </style>
+    {% endblock %}
+    {% block extrahead %}
+    <script>
+            function addRow(){
+                var template = document.getElementById('new-row-template');
+                var row = document.createElement('tr');
+                var cell = document.createElement('td');
+                row.innerHTML = `
+                                  <tr id="new-row-template">
+                                    <td><input type='checkbox' name='expense_id'></td>
+                                    <td><input type='number' name='expense_id'></td>
+                                    <td><select name="customer_id" id="customer_id">
+                                        {% for customer in customers %}
+                                            <option value="{{ customer.customer_id }}">{{ customer.first_name }}</option>
+                                        {% endfor %}
+                                    </select></td>
+                                    {% for product in products %}
+                                        <td><input type="checkbox" name="products" value="{{ product.product_id }}">{{ product.name }}</td>
+                                    {% endfor %}
+                                    <td><input type='date' name='expense_date' id='expense_date'></td>
+                                    <td><input type='number' name='quantity'></td>
+                                  </tr>
+                                  `;
+                document.getElementById('Table').appendChild(row);
+                row.appendChild(cell);
+                }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+        var table = $('#Table').DataTable();
+    
+        $('#Body').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+    
+        $('#DeleteButton').click(function () {
+            table.row('.selected').remove().draw(false);
+        });
+    });
+    </script>
+{% endblock %}
+</head>
+<body>
+    <!--BREADCRUMBS-->
+    {% block breadcrumbs %}
+        <ul>
+            <li><a href="{% url 'main:index' %}">Главная</a></li>
+            <li>Расходы</li>
+        </ul>
+    {% endblock %}
+    {% block content_title %}
+        <h1>Все расходы</h1>
+        <!--CREATE OBJECT FORM-->
+        <ul class="grp-object-tools">
+            {% block object-tools-items %}
+                <li><a href="{% url 'main:expense_add' %}" class="grp-add-link grp-state-focus">Добавить расход</a></li>
+            {% endblock %}
+        </ul>
+    {% endblock %}
+    {% block content %}
+        <br>
+        <!--DELETE OBJECT FOR CHECKBOXES FORM-->
+        <form action="{% url 'main:expense_add' %}" method="POST">
+            {% csrf_token %}
+            <!--Вывод объектов модели в виде таблицы-->
+            <table id="Table" class="grp-table display" style="width: 898px; float: left;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>№</th>
+                        <th>Покупатель</th>
+                        <th>Товар</th>
+                        <th>Дата расхода</th>
+                        <th>Количество товара</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody id="Body">
+                    {% for expense in expenses %}
+                        <tr class="grp-row-even">
+                            <td><input type="checkbox" name="expense_list" value="{{ expense.expense_id }}"></td> <!--Создание флажков для удаления-->
+                            <td><a href="{% url 'main:expense_change' pk=expense.pk %}">{{ expense.expense_id }}</a></td> <!--EDIT OBJECT FORM-->
+                            <td>{{ expense.customer_id.first_name }} {{ expense.customer_id.last_name }}</td>
+                            <td>{{ expense.products.all|join:", " }}</td>
+                            <td>{{ expense.expense_date }}</td>
+                            <td>{{ expense.quantity }}</td>
+                            <td>{{ expense.result }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <!--DELETE BUTTON FORM-->
+            <input type="submit" class="grp-button grp-default" id="form-center" value="Применить"/>
+        </form>
+        <input type="button" class="grp-button grp-default" id="AddButton" value="Добавить строку" onclick="addRow();">
+        <input type="button" class="grp-button grp-delete-link" id="DeleteButton" value="Удалить">
+        {% if form.errors %}
+        <div class="grp-module">
+            <p class="errornote">Вы допустили ошибки:
+                <div class="errorlist">
+                    {% for field in form %}
+                    <div>
+                        {% if field.errors %}<p>{{ field.label_tag }} {{ field.errors }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+            </p>
+        </div>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>
+

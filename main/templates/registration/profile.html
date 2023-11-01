@@ -1,0 +1,47 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Профиль{% endblock %}
+  {% block extrastyle %}
+  <!-- Добавляем свой стили и немного изменяем уже существующие из django-grappeli -->
+  <style>
+      #submit {
+        height: 40px;
+        border-radius: 0px;
+      }
+      .grp-module {
+        width: 25%;
+        height: 120px;
+      }
+  </style>
+{% endblock %}
+</head>
+<body>
+    <!-- BREADCRUMBS -->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li>Профиль</li>
+    </ul>
+{% endblock %}
+    {% block content %}
+    <h1>Профиль пользователя {{ user.username }}</h1>
+        <div class="grp-module">
+            <h2>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h2>
+            <div class="grp-row"><p><strong>Ваша должность: {{ user.position }}</strong></p></div>
+            <div class="grp-row"><p><strong>Ваш email: {{ user.email }}</strong></p></div>
+            {% if user.is_superuser %}
+                <div class="grp-row"><a href="{% url 'main:register' %}"><strong>Создать нового пользователя</strong></a></div>
+            {% endif %}
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block footer %}<footer id="submit" class="grp-fixed-footer"></footer>{% endblock %}
+</body>
+</html>

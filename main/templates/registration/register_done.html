@@ -1,0 +1,47 @@
+<!--Расширяем базовым шаблонном от django-grappeli, загружаем статику-->
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_modify grp_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="IE=edge">
+  {% block title %}Создание пользователя успешно{% endblock %}
+  {% block extrastyle %}
+  <!-- Добавляем свой стили и немного изменяем уже существующие из django-grappeli -->
+  <style>
+      #submit {
+        height: 40px;
+        border-radius: 0px;
+      }
+      .grp-module {
+        width: 25%;
+        height: 133px;
+      }
+  </style>
+{% endblock %}
+</head>
+<body>
+  <!-- BREADCRUMBS -->
+    {% block breadcrumbs %}
+    <ul>
+        <li><a href="{% url 'main:index' %}">Главная</a></li>
+        <li><a href="{% url 'main:profile' %}">Профиль</a></li>
+        <li><a href="{% url 'main:register' %}">Создание нового пользователя</a></li>
+        <li>Создание нового пользователя успешно</li>
+    </ul>
+{% endblock %}
+    {% block content %}
+    <h1>Создание пользователя успешно</h1>
+        <div class="grp-module">
+            <h2>Создание пользователя успешно, вы можете перейти на эти страницы:</h2>
+            <div class="grp-row"><p><a href="{% url 'main:index' %}"><strong>Вернуться на главную</strong></a></p></div>
+            <div class="grp-row"><p><a href="{% url 'main:profile' %}"><strong>Вернуться в свой профиль</strong></a></p></div>
+            <div class="grp-row"><p><a href="{% url 'main:register' %}"><strong>Создать нового пользователя</strong></a></p></div>
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block footer %}<footer id="submit" class="grp-fixed-footer"></footer>{% endblock %}
+</body>
+</html>
