@@ -33,7 +33,7 @@ Develop a website for a warehouse facility to simplify the accounting of supplie
 
 ---
 
-1) **Clone the repository**: ```git clone https://github.com/shoksdev/warehouse_work.git```  
+1) **Clone the repository**: ```git clone https://github.com/shoksdev/warehouse-django-site.git```  
 2) **Start the project with superuser creation**: ```docker-compose run django python manage.py createsuperuser```  
 3) **Bring the project**: ```docker-compose up```
 
