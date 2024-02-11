@@ -1,5 +1,7 @@
 # Warehouse Django Site
 
+---
+
 ### 🎯Purpose
 
 Develop a website for a warehouse facility to simplify the accounting of suppliers, customers, and merchandise.
