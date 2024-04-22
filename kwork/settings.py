@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'kwork.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': os.getenv('SQL_ENGINE'),
         'NAME': os.getenv('POSTGRES_NAME'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
